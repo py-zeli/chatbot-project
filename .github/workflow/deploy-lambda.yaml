@@ -3,9 +3,9 @@ name: Deploy AWS Lambda
 on:
   push:
     branches:
-      - main  # Altere para a sua branch principal (ex: master, main, develop)
+      - main  # 💡 AJUSTE: Mantenha 'main' ou altere para a branch principal que dispara o deploy.
     paths:
-      - 'sua_pasta_lambda/**' # Opcional: só dispara se houver alteração no código da lambda
+      - 'TesteCloud/**' # 💡 AJUSTE: Use o diretório completo para consistência.
 
 jobs:
   deploy:
@@ -14,45 +14,27 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # (Opcional) Instalar dependências, se aplicável (ex: nodejs, python)
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '18' # Ajuste a versão conforme sua Lambda
-
-      - name: Install dependencies
+      # 1. Criar o arquivo ZIP do código
+      - name: Zip Lambda code
         run: |
-          npm install
-        working-directory: ./sua_pasta_lambda # Mude para a pasta que contém o código da Lambda
-
-      # 1. Configurar Credenciais da AWS
+          # Navega para a pasta do código.
+          # Cria um ZIP que contém APENAS o conteúdo da pasta, não a pasta TesteCloud em si.
+          zip -r deployment-package.zip .
+        working-directory: ./TesteCloud # 💡 AJUSTE: Usando o diretório correto
+      
+      # 2. Configurar Credenciais da AWS
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: sua-regiao-aws # Ex: us-east-1, sa-east-1
+          aws-region: us-east-1 # 💡 AJUSTE: Mude para a sua região
 
-      # 2. Deploy da Função Lambda
+      # 3. Deploy da Função Lambda
+      # A ação aws-lambda-deploy irá pegar o ZIP e enviar para a função.
       - name: Deploy Lambda function
         uses: aws-actions/aws-lambda-deploy@v1.1.0
         with:
-          function-name: nome-da-sua-funcao-lambda # Nome exato da sua função na AWS
-          zip-file: ./deployment-package.zip # Nome do arquivo ZIP para o deploy
-          # Opcional: handler, runtime, memory-size, etc.
-
-      # 3. Criar o arquivo ZIP do código antes do deploy
-      # Nota: Você pode precisar de uma etapa para compactar seu código *antes* do deploy.
-
-      # Exemplo de etapa para compactar o código em ./deployment-package.zip
-      # Adapte este passo conforme a sua linguagem/estrutura.
-      - name: Zip Lambda code
-        run: |
-          zip -r deployment-package.zip .
-        working-directory: ./sua_pasta_lambda
-
-      - name: Deploy Lambda function (reaplicando com o zip-file correto)
-        uses: aws-actions/aws-lambda-deploy@v1.1.0
-        with:
-          function-name: nome-da-sua-funcao-lambda
-          zip-file: ./sua_pasta_lambda/deployment-package.zip # Caminho para o arquivo ZIP
+          function-name: slackBotTests # ⚠️ Mude para o NOME EXATO da sua função na AWS
+          zip-file: ./TesteCloud/deployment-package.zip # Caminho para o arquivo ZIP
+          # handler: script.lambda_handler # Opcional: Se quiser garantir o handler
