@@ -1,0 +1,20 @@
+{
+    "token": "seu_token_de_verificação_aqui",
+    "team_id": "T01234567",
+    "api_app_id": "A01234567",
+    "event": {
+        "client_msg_id": "7890abc-defg-1234-5678-hijk7890",
+        "type": "message",
+        "text": "Olá",
+        "user": "U01234567",
+        "ts": "1678886400.123456",
+        "team": "T01234567",
+        "channel": "C01234567",
+        "channel_type": "channel"
+    },
+    "type": "event_callback",
+    "event_id": "Ev01234567",
+    "event_time": 1678886400,
+    "authed_users": ["U01234567"],
+    "stage": "default"
+}
