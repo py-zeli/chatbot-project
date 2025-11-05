@@ -3,9 +3,9 @@ name: Deploy AWS Lambda
 on:
   push:
     branches:
-      - main  # 💡 AJUSTE: Mantenha 'main' ou altere para a branch principal que dispara o deploy.
+      - main
     paths:
-      - 'TesteCloud/**' # 💡 AJUSTE: Use o diretório completo para consistência.
+      - 'TesteCloud/**'
 
 jobs:
   deploy:
@@ -14,13 +14,11 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # 1. Criar o arquivo ZIP do código
+      # 1. Criar o arquivo ZIP do código (dentro do runner temporário)
       - name: Zip Lambda code
         run: |
-          # Navega para a pasta do código.
-          # Cria um ZIP que contém APENAS o conteúdo da pasta, não a pasta TesteCloud em si.
           zip -r deployment-package.zip .
-        working-directory: ./TesteCloud # 💡 AJUSTE: Usando o diretório correto
+        working-directory: ./TesteCloud
       
       # 2. Configurar Credenciais da AWS
       - name: Configure AWS credentials
@@ -28,13 +26,11 @@ jobs:
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-east-1 # 💡 AJUSTE: Mude para a sua região
+          aws-region: us-east-1
 
       # 3. Deploy da Função Lambda
-      # A ação aws-lambda-deploy irá pegar o ZIP e enviar para a função.
       - name: Deploy Lambda function
         uses: aws-actions/aws-lambda-deploy@v1.1.0
         with:
-          function-name: slackBotTests # ⚠️ Mude para o NOME EXATO da sua função na AWS
-          zip-file: ./TesteCloud/deployment-package.zip # Caminho para o arquivo ZIP
-          # handler: script.lambda_handler # Opcional: Se quiser garantir o handler
+          function-name: slackBotTests
+          zip-file: ./TesteCloud/deployment-package.zip
