@@ -14,13 +14,9 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # 1. Criar o arquivo ZIP do código (dentro do runner temporário)
-      - name: Zip Lambda code
-        run: |
-          zip -r deployment-package.zip .
-        working-directory: ./TesteCloud
+      # ❌ REMOVIDO: Etapa "Zip Lambda code". Não é mais necessária, a Action faz isso.
       
-      # 2. Configurar Credenciais da AWS
+      # 1. Configurar Credenciais da AWS
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
@@ -28,9 +24,11 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-1
 
-      # 3. Deploy da Função Lambda
+      # 2. Deploy da Função Lambda
       - name: Deploy Lambda function
         uses: aws-actions/aws-lambda-deploy@v1.1.0
         with:
           function-name: slackBotTests
-          zip-file: ./TesteCloud/deployment-package.zip
+          # 💡 CORREÇÃO: Usando 'code-artifacts-dir' e apontando para a pasta fonte.
+          code-artifacts-dir: ./TesteCloud 
+          aws-region: us-east-1
